@@ -1,4 +1,4 @@
 # TO-DO
 
-[ ] Predefine DataFrame size
-[ ] 
+- [ ] Predefine DataFrame size
+- [ ] 
