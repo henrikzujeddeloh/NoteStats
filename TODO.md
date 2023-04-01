@@ -1,5 +1,6 @@
 # TO-DO
 
+- [ ] Add zero-count days
 - [ ] Predefine DataFrame size
 - [ ] Fix additional windows after displaying graph
 - [ ] Speed up import of libraries
