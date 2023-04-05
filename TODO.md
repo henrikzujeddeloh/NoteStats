@@ -1,9 +1,12 @@
 # TO-DO
 
-- [ ] Add zero-count days
+- [x] Add zero-count days
 - [ ] Predefine DataFrame size
-- [ ] Fix additional windows after displaying graph
+- [x] Fix additional windows after displaying graph
 - [ ] Speed up import of libraries
 - [ ] Store file modification time in DataFrame
-- [ ] Store file size in DataFrame
-- [ ] List largest notes with size 
+- [x] Store file size in DataFrame
+- [ ] Histogram of note size 
+- [ ] List notes by size (or bar graph?)
+- [ ] Convert size to MB
+- [ ] Histogram of "days since last edit"
