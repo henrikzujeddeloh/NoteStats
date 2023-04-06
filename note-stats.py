@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +10,9 @@ import numpy as np
 def get_creation_time(path):
     return os.stat(path).st_birthtime
 
+# Function to return modification time of file
+def get_modification_time(path):
+    return os.path.getmtime(path)
 
 # Function to return size of file
 def get_size(path):
@@ -20,7 +24,7 @@ def get_size(path):
 folder_path = sys.argv[1]
 
 # Creates pandas DataFrame with relevant colomns
-df = pd.DataFrame(columns=('note', 'creation_time', 'size'))
+df = pd.DataFrame(columns=('note', 'creation_time', 'modification_time', 'size'))
 
 # Loops through all files in selected directory
 i = 0
@@ -30,22 +34,29 @@ for filename in os.listdir(folder_path):
     # checks if path is a file
     if os.path.isfile(f):
         creation = pd.to_datetime(int(get_creation_time(f)), utc='True', unit='s')
+        modification = pd.to_datetime(int(get_modification_time(f)), utc='True', unit='s')
         size = get_size(f)
         # adds i-th row to df with note info
-        df.loc[i] = [filename, creation, size]
+        df.loc[i] = [filename, creation, modification, size]
         i += 1
 
-
-
+# defines some date functions
 convert_tz = lambda x: x.to_pydatetime()
 get_date = lambda x: '{}-{:02}-{:02}'.format(convert_tz(x).year, convert_tz(x).month, convert_tz(x).day)
 get_month = lambda x: convert_tz(x).month
 
-# adds column to dataframe with creation date
+# adds column to dataframe with creation and modificatoin date
 df['creation_date'] = df['creation_time'].map(get_date)
+df['modification_date'] = df['modification_time'].map(get_date)
+
 # adds column to dataframe with creation month
 df['creation_month'] = df['creation_time'].map(get_month)
-print(df)
+
+# adds days since last edit column
+today = pd.to_datetime("now")
+df['last_edit'] = -(pd.to_datetime(df['modification_date']) - today).dt.days
+
+#print(df)
 
 
 # Sets dimensions of graph
@@ -67,11 +78,18 @@ creation_month = df.groupby(['creation_month']).size()
 print(creation_month)
 
 
-plt1 = plt.subplots(figsize=(WIDTH, HEIGHT), dpi=DPI)
+# create histogram of days since last edit
+plt.figure("Days since last edit histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
+plt.hist(df["last_edit"], bins = 30, color='#63abdb')
+plt.title("Days since last edit")
+plt.xlabel("Days")
 
-plt1 = creation_date.plot(kind='line', figsize=[WIDTH,HEIGHT], linewidth=3, color='#63abdb')
 
-plt1.set_title("Note creation")
-plt1.set_xlabel("Date")
-plt1.set_ylabel("Count")
+# creates plot of note creation by date
+plt.figure("Note creation by date", figsize=[WIDTH,HEIGHT], dpi=DPI)
+creation_date.plot(kind='line', linewidth=3, color='#63abdb')
+plt.title("Note creation")
+plt.xlabel("Date")
+plt.ylabel("Count")
+
 plt.show()
