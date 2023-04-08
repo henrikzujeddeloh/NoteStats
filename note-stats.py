@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime
+import calendar
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,7 +57,8 @@ df['creation_month'] = df['creation_time'].map(get_month)
 today = pd.to_datetime("now")
 df['last_edit'] = -(pd.to_datetime(df['modification_date']) - today).dt.days
 
-#print(df)
+# prints memory usage of dataframe
+print(df.info(memory_usage="deep"))
 
 
 # Sets dimensions of graph
@@ -71,11 +73,9 @@ max_date = creation_date.index.max()
 date_range = pd.date_range(min_date, max_date)
 creation_date.index = pd.DatetimeIndex(creation_date.index)
 creation_date = creation_date.reindex(date_range, fill_value=0)
-print(creation_date)
 
 # creates new dataframe with number of notes created per month
 creation_month = df.groupby(['creation_month']).size()
-print(creation_month)
 
 
 # create histogram of days since last edit
@@ -91,5 +91,13 @@ creation_date.plot(kind='line', linewidth=3, color='#63abdb')
 plt.title("Note creation")
 plt.xlabel("Date")
 plt.ylabel("Count")
+
+# creates plot of note creation by month
+plt.figure("Note creation by month", figsize=[WIDTH,HEIGHT], dpi=DPI)
+creation_month.plot(kind='bar')
+plt.title("Note creation")
+plt.xlabel("Month")
+plt.ylabel("Count")
+plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
 
 plt.show()
