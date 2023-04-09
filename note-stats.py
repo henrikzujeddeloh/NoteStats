@@ -33,16 +33,17 @@ def create_df(folder):
     # Loops through all files in selected directory
     i = 0
     for filename in os.listdir(folder):
-        # f is path to current file
-        f = os.path.join(folder, filename)
-        # checks if path is a file
-        if os.path.isfile(f):
-            creation = pd.to_datetime(int(get_creation_time(f)), utc='True', unit='s')
-            modification = pd.to_datetime(int(get_modification_time(f)), utc='True', unit='s')
-            size = get_size(f)
-            # adds i-th row to df with note info
-            data_frame.loc[i] = [filename, creation, modification, size]
-            i += 1
+        if not filename.startswith('.'):
+            # f is path to current file
+            f = os.path.join(folder, filename)
+            # checks if path is a file and not a hidden file (like .DS_Store)
+            if os.path.isfile(f):
+                creation = pd.to_datetime(int(get_creation_time(f)), utc='True', unit='s')
+                modification = pd.to_datetime(int(get_modification_time(f)), utc='True', unit='s')
+                size = get_size(f)
+                # adds i-th row to df with note info
+                data_frame.loc[i] = [filename, creation, modification, size]
+                i += 1
     return data_frame
 
 def show_date(data_frame):
@@ -92,11 +93,21 @@ def show_hist(data_frame):
 
     # create histogram of days since last edit
     plt.figure("Days since last edit histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
-    plt.hist(df["last_edit"], bins = 30, color='#63abdb')
+    plt.hist(dataframe["last_edit"], bins = 30, color='#63abdb')
     plt.title("Days since last edit")
     plt.xlabel("Days")
 
 
+def show_size(data_frame):
+
+    data_frame = data_frame.sort_values(by='size', ascending=False)
+    data_frame['size'] = data_frame['size']/1000
+    plt.figure("File size histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
+    plt.hist(data_frame["size"])
+    plt.title("Note size")
+    plt.xlabel("Size (KiB)")
+    print(data_frame)
+    
 
 # defines some date functions
 convert_tz = lambda x: x.to_pydatetime()
@@ -111,6 +122,7 @@ parser.add_argument("folder_path", help="path to notes direcotry which should be
 parser.add_argument("--hist", help="output days since last edit histogram", action="store_true")
 parser.add_argument("--date", help="output creation by date plot", action="store_true")
 parser.add_argument("--month", help="output creation by month plot", action="store_true")
+parser.add_argument("--size", help="output note by size bar graph", action="store_true")
 args = parser.parse_args()
 
 
@@ -128,7 +140,9 @@ if args.month:
 if args.hist:
     show_hist(df)
 
+if args.size:
+    show_size(df)
+
 # prints memory usage of dataframe
 print(df.info(memory_usage="deep"))
-print(sys.getsizeof(df))
 plt.show()
