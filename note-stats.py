@@ -5,6 +5,7 @@ import tracemalloc
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 from tabulate import tabulate
 
 # Sets dimensions of graph
@@ -120,11 +121,28 @@ def show_size(data_frame):
     print("5 Largest Notes: \n" + tabulate(top_5[['note', 'size']], headers=['Note', 'Size (KiB)'], tablefmt='psql', showindex=False))
     
 
+def show_heatmap(data_frame):
+    
+    # add weekday coloumn
+    data_frame["weekday"] = data_frame["modification_time"].dt.day_name()
+    
+    # put weekdays in correct order (starting with monday
+    week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    data_frame['weekday'] = pd.Categorical(data_frame['weekday'], categories=week_days, ordered=True)
+    data_frame = data_frame.sort_values('weekday')
+    
+    # add hour of day column
+    data_frame["hour"] = data_frame["modification_time"].dt.hour
+    hour_weekday = data_frame.groupby(["weekday", "hour"]).size().unstack()
+    
+    # create heatmap
+    plt.figure("Modification time heatmap", figsize=[WIDTH,HEIGHT], dpi=DPI)
+    sns.heatmap(hour_weekday, cmap="Blues")
+
 # defines some date functions
 convert_tz = lambda x: x.to_pydatetime()
 get_date = lambda x: '{}-{:02}-{:02}'.format(convert_tz(x).year, convert_tz(x).month, convert_tz(x).day)
 get_month = lambda x: convert_tz(x).month
-
 
 
 # parses passed arguments
@@ -134,6 +152,7 @@ parser.add_argument("--hist", help="output days since last edit histogram", acti
 parser.add_argument("--date", help="output creation by date plot", action="store_true")
 parser.add_argument("--month", help="output creation by month plot", action="store_true")
 parser.add_argument("--size", help="output note by size bar graph", action="store_true")
+parser.add_argument("--heatmap", help="output heatmap of note modification time", action="store_true")
 args = parser.parse_args()
 
 
@@ -153,6 +172,11 @@ if args.hist:
 
 if args.size:
     show_size(df)
+
+if args.heatmap:
+    show_heatmap(df)
+
+
 
 # prints memory usage of dataframe
 print(df.info(memory_usage="deep"))
