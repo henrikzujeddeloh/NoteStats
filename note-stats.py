@@ -5,7 +5,7 @@ import tracemalloc
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-
+from tabulate import tabulate
 
 # Sets dimensions of graph
 DPI = 100
@@ -92,21 +92,32 @@ def show_hist(data_frame):
     data_frame['last_edit'] = -(pd.to_datetime(df['modification_date']) - today).dt.days
 
     # create histogram of days since last edit
+    BIN_WIDTH = 5
     plt.figure("Days since last edit histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
-    plt.hist(dataframe["last_edit"], bins = 30, color='#63abdb')
+    bins = np.arange(0, data_frame['last_edit'].max(), BIN_WIDTH)
+    plt.hist(data_frame["last_edit"], bins = bins, color='#63abdb', edgecolor='black',  linewidth=1)
     plt.title("Days since last edit")
     plt.xlabel("Days")
-
+    top_5 = data_frame.sort_values(by='last_edit', ascending=False).head(5)
+    print("5 Oldest Notes: \n" + tabulate(top_5[['note','last_edit']], headers=['Note', 'Last Edit (days)'], tablefmt='psql', showindex=False))
 
 def show_size(data_frame):
 
+    # sorts notes by size
     data_frame = data_frame.sort_values(by='size', ascending=False)
+    
+    # converts bytes to kilobytes
     data_frame['size'] = data_frame['size']/1000
+    
+    # creates histogram
+    BIN_WIDTH = 0.2
     plt.figure("File size histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
-    plt.hist(data_frame["size"])
+    bins = np.arange(0, data_frame['size'].max(), BIN_WIDTH)
+    plt.hist(data_frame["size"], bins=bins, color='#63abdb', edgecolor='black',  linewidth=1)
     plt.title("Note size")
     plt.xlabel("Size (KiB)")
-    print(data_frame)
+    top_5 = data_frame.head(5)
+    print("5 Largest Notes: \n" + tabulate(top_5[['note', 'size']], headers=['Note', 'Size (KiB)'], tablefmt='psql', showindex=False))
     
 
 # defines some date functions
