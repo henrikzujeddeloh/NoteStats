@@ -8,23 +8,31 @@ import numpy as np
 import seaborn as sns
 from tabulate import tabulate
 
+
 # Sets dimensions of graph
 DPI = 100
 WIDTH = 10
 HEIGHT = 5
 
 
+
 # Function to return creation time of file
 def get_creation_time(path):
     return os.stat(path).st_birthtime
+
+
 
 # Function to return modification time of file
 def get_modification_time(path):
     return os.path.getmtime(path)
 
+
+
 # Function to return size of file
 def get_size(path):
     return os.stat(path).st_size
+
+
 
 def create_df(folder):
     
@@ -47,6 +55,8 @@ def create_df(folder):
                 i += 1
     return data_frame
 
+
+
 def show_date(data_frame):
 
     # adds column to dataframe with creation and modificatoin date
@@ -68,6 +78,7 @@ def show_date(data_frame):
     plt.ylabel("Count")
 
 
+
 def show_month(data_frame):
 
     # adds column to dataframe with creation month
@@ -83,6 +94,7 @@ def show_month(data_frame):
     plt.xlabel("Month")
     plt.ylabel("Count")
     plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+
 
 
 def show_hist(data_frame):
@@ -101,6 +113,8 @@ def show_hist(data_frame):
     plt.xlabel("Days")
     top_5 = data_frame.sort_values(by='last_edit', ascending=False).head(5)
     print("5 Oldest Notes: \n" + tabulate(top_5[['note','last_edit']], headers=['Note', 'Last Edit (days)'], tablefmt='psql', showindex=False))
+
+
 
 def show_size(data_frame):
 
@@ -121,6 +135,7 @@ def show_size(data_frame):
     print("5 Largest Notes: \n" + tabulate(top_5[['note', 'size']], headers=['Note', 'Size (KiB)'], tablefmt='psql', showindex=False))
     
 
+
 def show_heatmap(data_frame):
     
     # add weekday coloumn
@@ -133,16 +148,24 @@ def show_heatmap(data_frame):
     
     # add hour of day column
     data_frame["hour"] = data_frame["modification_time"].dt.hour
+    
+    # creates new pivot table with hour of day and day of week
     hour_weekday = data_frame.groupby(["weekday", "hour"]).size().unstack()
     
     # create heatmap
     plt.figure("Modification time heatmap", figsize=[WIDTH,HEIGHT], dpi=DPI)
     sns.heatmap(hour_weekday, cmap="Blues")
 
+
+
+
 # defines some date functions
 convert_tz = lambda x: x.to_pydatetime()
 get_date = lambda x: '{}-{:02}-{:02}'.format(convert_tz(x).year, convert_tz(x).month, convert_tz(x).day)
 get_month = lambda x: convert_tz(x).month
+
+
+
 
 
 # parses passed arguments
