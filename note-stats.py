@@ -1,7 +1,5 @@
 import os
-import datetime
 import argparse
-import tracemalloc
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +8,6 @@ from tabulate import tabulate
 
 
 # Sets dimensions of graph
-DPI = 100
 WIDTH = 10
 HEIGHT = 5
 
@@ -60,7 +57,7 @@ def create_df(folder):
 def show_date(data_frame):
 
     # adds column to dataframe with creation and modificatoin date
-    data_frame['creation_date'] = data_frame['creation_time'].map(get_date)
+    data_frame['creation_date'] = pd.to_datetime(data_frame['creation_time']).dt.date
 
     # creates new dataframe with number of notes created per day
     creation_date = data_frame.groupby(['creation_date']).size()
@@ -71,11 +68,8 @@ def show_date(data_frame):
     creation_date = creation_date.reindex(date_range, fill_value=0)
 
     # creates plot of note creation by date
-    plt.figure("Note creation by date", figsize=[WIDTH,HEIGHT], dpi=DPI)
-    creation_date.plot(kind='line', linewidth=3, color='#63abdb')
-    plt.title("Note creation")
-    plt.xlabel("Date")
-    plt.ylabel("Count")
+    fig_date, axs_date = plt.subplots(figsize=[WIDTH,HEIGHT])
+    creation_date.plot(ax=axs_date, kind='line', linewidth=3, color='#63abdb', title="Note creation", xlabel="Date", ylabel="Count")
 
 
 
@@ -88,29 +82,25 @@ def show_month(data_frame):
     creation_month = data_frame.groupby(['creation_month']).size()
 
     # creates plot of note creation by month
-    plt.figure("Note creation by month", figsize=[WIDTH,HEIGHT], dpi=DPI)
-    creation_month.plot(kind='bar')
-    plt.title("Note creation")
-    plt.xlabel("Month")
-    plt.ylabel("Count")
-    plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+    fig_month, axs_month = plt.subplots(figsize=[WIDTH,HEIGHT])
+    creation_month.plot(kind='bar', ax=axs_month, title="Note Creation", xlabel="Month", ylabel="Count")
+    axs_month.set_xticks([0,1,2,3,4,5,6,7,8,9,10,11])
+    axs_month.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
 
 
 
 def show_hist(data_frame):
 
     # adds days since last edit column
-    data_frame['modification_date'] = data_frame['modification_time'].map(get_date)
+    data_frame['modification_date'] = pd.to_datetime(data_frame['modification_time']).dt.date
     today = pd.to_datetime("now")
-    data_frame['last_edit'] = -(pd.to_datetime(df['modification_date']) - today).dt.days
+    data_frame['last_edit'] = -(pd.to_datetime(data_frame['modification_date']) - today).dt.days
 
     # create histogram of days since last edit
     BIN_WIDTH = 5
-    plt.figure("Days since last edit histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
     bins = np.arange(0, data_frame['last_edit'].max(), BIN_WIDTH)
-    plt.hist(data_frame["last_edit"], bins = bins, color='#63abdb', edgecolor='black',  linewidth=1)
-    plt.title("Days since last edit")
-    plt.xlabel("Days")
+    fig_hist, axs_hist = plt.subplots(figsize=[WIDTH, HEIGHT])
+    data_frame["last_edit"].plot(ax=axs_hist, kind='hist', bins = bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Days since last edit", xlabel="Days")
     top_5 = data_frame.sort_values(by='last_edit', ascending=False).head(5)
     print("5 Oldest Notes: \n" + tabulate(top_5[['note','last_edit']], headers=['Note', 'Last Edit (days)'], tablefmt='psql', showindex=False))
 
@@ -126,11 +116,9 @@ def show_size(data_frame):
     
     # creates histogram
     BIN_WIDTH = 0.2
-    plt.figure("File size histogram", figsize=[WIDTH,HEIGHT], dpi=DPI)
     bins = np.arange(0, data_frame['size'].max(), BIN_WIDTH)
-    plt.hist(data_frame["size"], bins=bins, color='#63abdb', edgecolor='black',  linewidth=1)
-    plt.title("Note size")
-    plt.xlabel("Size (KiB)")
+    fig_size, axs_size = plt.subplots(figsize=[WIDTH,HEIGHT])
+    data_frame["size"].plot(ax=axs_size, kind='hist', bins=bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Note Size", xlabel="Size (KiB)")
     top_5 = data_frame.head(5)
     print("5 Largest Notes: \n" + tabulate(top_5[['note', 'size']], headers=['Note', 'Size (KiB)'], tablefmt='psql', showindex=False))
     
@@ -153,15 +141,14 @@ def show_heatmap(data_frame):
     hour_weekday = data_frame.groupby(["weekday", "hour"]).size().unstack()
     
     # create heatmap
-    plt.figure("Modification time heatmap", figsize=[WIDTH,HEIGHT], dpi=DPI)
-    sns.heatmap(hour_weekday, cmap="Blues")
-
+    fig_heatmap, axs_heatmap = plt.subplots(figsize=[WIDTH,HEIGHT])
+    sns.heatmap(hour_weekday, cmap="Blues", ax=axs_heatmap)
+    axs_heatmap.set_title("Modification Time")
 
 
 
 # defines some date functions
 convert_tz = lambda x: x.to_pydatetime()
-get_date = lambda x: '{}-{:02}-{:02}'.format(convert_tz(x).year, convert_tz(x).month, convert_tz(x).day)
 get_month = lambda x: convert_tz(x).month
 
 
