@@ -11,7 +11,7 @@ from tabulate import tabulate
 WIDTH = 10
 HEIGHT = 5
 
-
+TIMEZONE = 'Europe/Berlin'
 
 # Function to return creation time of file
 def get_creation_time(path):
@@ -44,8 +44,8 @@ def create_df(folder):
             f = os.path.join(folder, filename)
             # checks if path is a file and not a hidden file (like .DS_Store)
             if os.path.isfile(f):
-                creation = pd.to_datetime(int(get_creation_time(f)), utc='True', unit='s')
-                modification = pd.to_datetime(int(get_modification_time(f)), utc='True', unit='s')
+                creation = pd.to_datetime(int(get_creation_time(f)), utc=True, unit='s').tz_convert(TIMEZONE)
+                modification = pd.to_datetime(int(get_modification_time(f)), utc=True, unit='s').tz_convert(TIMEZONE)
                 size = get_size(f)
                 # adds i-th row to df with note info
                 data_frame.loc[i] = [filename, creation, modification, size]
@@ -136,7 +136,7 @@ def show_heatmap(data_frame):
     
     # add hour of day column
     data_frame["hour"] = data_frame["modification_time"].dt.hour
-    
+    print(data_frame) 
     # creates new pivot table with hour of day and day of week
     hour_weekday = data_frame.groupby(["weekday", "hour"]).size().unstack()
     
