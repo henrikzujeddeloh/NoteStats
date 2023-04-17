@@ -8,5 +8,7 @@
 - [x] Store file size in DataFrame
 - [x] Histogram of note size 
 - [ ] List notes by size (or bar graph?)
-- [x] Convert size to xB
+- [x] Convert size to KiB
 - [x] Histogram of "days since last edit"
+- [ ] Remove creation of new dataframes
+- [ ] Dynamically select size unit (KiB, MiB, etc)

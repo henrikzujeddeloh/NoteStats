@@ -76,7 +76,7 @@ def show_date(data_frame):
 def show_month(data_frame):
 
     # adds column to dataframe with creation month
-    data_frame['creation_month'] = data_frame['creation_time'].map(get_month)
+    data_frame['creation_month'] = data_frame['creation_time']).map(get_month)
 
     # creates new dataframe with number of notes created per month
     creation_month = data_frame.groupby(['creation_month']).size()
@@ -84,7 +84,7 @@ def show_month(data_frame):
     # creates plot of note creation by month
     fig_month, axs_month = plt.subplots(figsize=[WIDTH,HEIGHT])
     creation_month.plot(kind='bar', ax=axs_month, title="Note Creation", xlabel="Month", ylabel="Count")
-    axs_month.set_xticks([0,1,2,3,4,5,6,7,8,9,10,11])
+    axs_month.set_xticks(np.arange(0,12,1))
     axs_month.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
 
 
@@ -121,7 +121,7 @@ def show_size(data_frame):
     data_frame["size"].plot(ax=axs_size, kind='hist', bins=bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Note Size", xlabel="Size (KiB)")
     top_5 = data_frame.head(5)
     print("5 Largest Notes: \n" + tabulate(top_5[['note', 'size']], headers=['Note', 'Size (KiB)'], tablefmt='psql', showindex=False))
-    
+    print("Total note library size: " +  str(round(data_frame['size'].sum(), 1)) + " KiB")    
 
 
 def show_heatmap(data_frame):
@@ -187,7 +187,4 @@ if args.heatmap:
     show_heatmap(df)
 
 
-
-# prints memory usage of dataframe
-print(df.info(memory_usage="deep"))
 plt.show()
