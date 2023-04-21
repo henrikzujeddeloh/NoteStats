@@ -38,6 +38,7 @@ def create_df(folder):
 
     # Loops through all files in selected directory
     i = 0
+    numfiles = len(os.listdir(folder))
     for filename in os.listdir(folder):
         if not filename.startswith('.'):
             # f is path to current file
@@ -50,6 +51,7 @@ def create_df(folder):
                 # adds i-th row to df with note info
                 data_frame.loc[i] = [filename, creation, modification, size]
                 i += 1
+                #print("FILE: " + str(i) + " of " + str(numfiles), end='\r')
     return data_frame
 
 
@@ -76,7 +78,7 @@ def show_date(data_frame):
 def show_month(data_frame):
 
     # adds column to dataframe with creation month
-    data_frame['creation_month'] = data_frame['creation_time']).map(get_month)
+    data_frame['creation_month'] = data_frame['creation_time'].map(get_month)
 
     # creates new dataframe with number of notes created per month
     creation_month = data_frame.groupby(['creation_month']).size()
@@ -98,7 +100,7 @@ def show_hist(data_frame):
 
     # create histogram of days since last edit
     BIN_WIDTH = 5
-    bins = np.arange(0, data_frame['last_edit'].max(), BIN_WIDTH)
+    bins = np.arange(0, data_frame['last_edit'].max()+BIN_WIDTH, BIN_WIDTH)
     fig_hist, axs_hist = plt.subplots(figsize=[WIDTH, HEIGHT])
     data_frame["last_edit"].plot(ax=axs_hist, kind='hist', bins = bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Days since last edit", xlabel="Days")
     top_5 = data_frame.sort_values(by='last_edit', ascending=False).head(5)
@@ -115,8 +117,8 @@ def show_size(data_frame):
     data_frame['size'] = data_frame['size']/1000
     
     # creates histogram
-    BIN_WIDTH = 0.2
-    bins = np.arange(0, data_frame['size'].max(), BIN_WIDTH)
+    BIN_WIDTH = 0.5
+    bins = np.arange(0, data_frame['size'].max()+BIN_WIDTH, BIN_WIDTH)
     fig_size, axs_size = plt.subplots(figsize=[WIDTH,HEIGHT])
     data_frame["size"].plot(ax=axs_size, kind='hist', bins=bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Note Size", xlabel="Size (KiB)")
     top_5 = data_frame.head(5)
@@ -188,3 +190,5 @@ if args.heatmap:
 
 
 plt.show()
+
+print(df.info(memory_usage='deep'))

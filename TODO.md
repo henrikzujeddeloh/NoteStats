@@ -12,3 +12,4 @@
 - [x] Histogram of "days since last edit"
 - [ ] Remove creation of new dataframes
 - [ ] Dynamically select size unit (KiB, MiB, etc)
+- [x] Fix histogram not showing last bin
