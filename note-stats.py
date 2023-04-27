@@ -1,3 +1,4 @@
+import sys
 import os
 import argparse
 import pandas as pd
@@ -59,7 +60,7 @@ def create_df(folder):
 def show_date(data_frame):
 
     # adds column to dataframe with creation and modificatoin date
-    data_frame['creation_date'] = pd.to_datetime(data_frame['creation_time']).dt.date
+    data_frame['creation_date'] = data_frame['creation_time'].dt.date
 
     # creates new dataframe with number of notes created per day
     creation_date = data_frame.groupby(['creation_date']).size()
@@ -94,7 +95,7 @@ def show_month(data_frame):
 def show_hist(data_frame):
 
     # adds days since last edit column
-    data_frame['modification_date'] = pd.to_datetime(data_frame['modification_time']).dt.date
+    data_frame['modification_date'] = data_frame['modification_time'].dt.date
     today = pd.to_datetime("now")
     data_frame['last_edit'] = -(pd.to_datetime(data_frame['modification_date']) - today).dt.days
 
@@ -168,6 +169,11 @@ parser.add_argument("--heatmap", help="output heatmap of note modification time"
 args = parser.parse_args()
 
 
+if len(sys.argv)==2:
+    parser.print_help()
+    # parser.print_usage() # for just the usage line
+    parser.exit()
+args = parser.parse_args()
 
 df = create_df(args.folder_path)
 
