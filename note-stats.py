@@ -1,29 +1,37 @@
 import matplotlib.pyplot as plt
 
-from modules.parse_arguments import parse_arguments
+import modules.input as input
 from modules.create_dataframe import create_df
 import modules.generate_outputs as output
 
 
-args = parse_arguments()
+arguments = input.parse_arguments()
 
-df = create_df(args.folder_path)
+df = create_df(arguments.folder_path)
 
-if args.date:
-    output.show_date(df)
 
-if args.month:
-    output.show_month(df)
+next = ''
+while next != 'q':
 
-if args.hist:
-    output.show_hist(df)
+    if arguments.date:
+        output.show_date(df)
 
-if args.size:
-    output.show_size(df)
+    if arguments.month:
+        output.show_month(df)
 
-if args.heatmap:
-    output.show_heatmap(df)
+    if arguments.hist:
+        output.show_hist(df)
 
-plt.show()
+    if arguments.size:
+        output.show_size(df)
 
-print(df.info(memory_usage='deep'))
+    if arguments.heatmap:
+        output.show_heatmap(df)
+
+    plt.show()
+
+    #print(df.info(memory_usage='deep'))
+
+    next = input.select_next_visualization()
+    arguments = input.update_args(arguments, next)
+

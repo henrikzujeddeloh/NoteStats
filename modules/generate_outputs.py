@@ -46,24 +46,6 @@ def show_month(data_frame):
     axs_month.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
 
 
-
-def show_hist(data_frame):
-
-    # adds days since last edit column
-    data_frame['modification_date'] = data_frame['modification_time'].dt.date
-    today = pd.to_datetime("now")
-    data_frame['last_edit'] = -(pd.to_datetime(data_frame['modification_date']) - today).dt.days
-
-    # create histogram of days since last edit
-    BIN_WIDTH = 5
-    bins = np.arange(0, data_frame['last_edit'].max()+BIN_WIDTH, BIN_WIDTH)
-    fig_hist, axs_hist = plt.subplots(figsize=[const.WIDTH, const.HEIGHT])
-    data_frame["last_edit"].plot(ax=axs_hist, kind='hist', bins = bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Days since last edit", xlabel="Days")
-    top_5 = data_frame.sort_values(by='last_edit', ascending=False).head(5)
-    print("5 Oldest Notes: \n" + tabulate(top_5[['note','last_edit']], headers=['Note', 'Last Edit (days)'], tablefmt='psql', showindex=False))
-
-
-
 def show_size(data_frame):
 
     # sorts notes by size
@@ -80,6 +62,22 @@ def show_size(data_frame):
     top_5 = data_frame.head(5)
     print("5 Largest Notes: \n" + tabulate(top_5[['note', 'size']], headers=['Note', 'Size (KiB)'], tablefmt='psql', showindex=False))
     print("Total note library size: " +  str(round(data_frame['size'].sum(), 1)) + " KiB")    
+
+
+def show_hist(data_frame):
+
+    # adds days since last edit column
+    data_frame['modification_date'] = data_frame['modification_time'].dt.date
+    today = pd.to_datetime("now")
+    data_frame['last_edit'] = -(pd.to_datetime(data_frame['modification_date']) - today).dt.days
+
+    # create histogram of days since last edit
+    BIN_WIDTH = 5
+    bins = np.arange(0, data_frame['last_edit'].max()+BIN_WIDTH, BIN_WIDTH)
+    fig_hist, axs_hist = plt.subplots(figsize=[const.WIDTH, const.HEIGHT])
+    data_frame["last_edit"].plot(ax=axs_hist, kind='hist', bins = bins, color='#63abdb', edgecolor='black',  linewidth=1, title="Days since last edit", xlabel="Days")
+    top_5 = data_frame.sort_values(by='last_edit', ascending=False).head(5)
+    print("5 Oldest Notes: \n" + tabulate(top_5[['note','last_edit']], headers=['Note', 'Last Edit (days)'], tablefmt='psql', showindex=False))
 
 
 def show_heatmap(data_frame):

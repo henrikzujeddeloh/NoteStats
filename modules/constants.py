@@ -1,8 +1,9 @@
-
 # Sets dimensions of graph
 WIDTH = 10
 HEIGHT = 5
 
+# set timezone
 TIMEZONE = 'Europe/Berlin'
 
-# Define width of histogram bin
+# File extensions to include
+INCLUDE_EXT = ('.md', '.txt', '.norg')
