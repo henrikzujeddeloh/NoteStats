@@ -1,14 +1,15 @@
 # Note Stats
 
-A program to generate some statistics on the creation and modification dates of notes.
+A program to generate various statistics on a library of notes.
 
 ## Usage
 
 1. Install requirements with `pip3 install -r requirements.txt`
-
-2. Run `note-stats.py /path/to/notes` with path to directory where the notes are stored. Sub-directories are not (yet) scanned.
+2. Run `note-stats.py /path/to/notes` with path to directory where the notes are stored. Subirectories are also scanned!
 
 ### Arguments
+
+Can be passed with the path to notes directory to directly display visualization. A visualization can also be selected after the fact.
 
 | Argument | Description |
 | --- | --- |
@@ -19,4 +20,8 @@ A program to generate some statistics on the creation and modification dates of 
 | `--heatmap` | Creates heatmap of the hour and day of week that notes were edited |
 
 
-[TO-DO](/TODO.md)
+## Configuration
+
+### Scanned file types
+In `modules/constants.py`, `INCLUDE_EXT` can be set to include desired file types to be scanned.
+Here the timezone can also be set for correct date-time parsing.
